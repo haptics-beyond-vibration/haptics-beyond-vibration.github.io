@@ -142,6 +142,99 @@
   .nav-links a { text-decoration: none; }
   .nav-links a:hover { color: var(--hot-deep); }
 
+  /* Menu toggle: mobile only — hidden here so the desktop nav is unchanged. */
+  .nav-toggle { display: none; }
+
+  /* ---------- Nav: mobile ---------- */
+  @media (max-width: 768px) {
+    nav.site .container {
+      /* Compact bar; max() keeps clear of the notch in landscape. */
+      padding: 8px max(18px, env(safe-area-inset-right)) 8px max(18px, env(safe-area-inset-left));
+      gap: 12px;
+    }
+    .wordmark {
+      /* Shrinks just enough to sit beside the toggle at 320px without wrapping. */
+      font-size: clamp(0.95rem, 4.2vw, 1.06rem);
+      min-width: 0;
+    }
+
+    .nav-toggle {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      justify-content: center;
+      width: 44px;
+      height: 44px;
+      margin-right: -10px;      /* full 44px target, glyph stays optically aligned */
+      padding: 0;
+      border: 0;
+      background: none;
+      color: var(--ink);
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-toggle .bars,
+    .nav-toggle .bars::before,
+    .nav-toggle .bars::after {
+      content: '';
+      display: block;
+      width: 20px;
+      height: 1.5px;
+      border-radius: 1px;
+      background: currentColor;
+      transition: transform .2s ease, background .2s ease;
+    }
+    .nav-toggle .bars { position: relative; }
+    .nav-toggle .bars::before { position: absolute; top: -6px; }
+    .nav-toggle .bars::after  { position: absolute; top: 6px; }
+    .nav-toggle[aria-expanded="true"] .bars { background: transparent; }
+    .nav-toggle[aria-expanded="true"] .bars::before { top: 0; transform: rotate(45deg); }
+    .nav-toggle[aria-expanded="true"] .bars::after  { top: 0; transform: rotate(-45deg); }
+
+    /* Single-column panel pinned under the bar: opening it never grows the
+       header or pushes page content down. */
+    .nav-links {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      flex-wrap: nowrap;
+      gap: 0;
+      padding: 2px max(18px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
+      background: var(--paper);      /* solid: page text must not ghost through */
+      border-bottom: 1px solid var(--line);
+      max-height: calc(100vh - 100%);
+      max-height: calc(100dvh - 100%);
+      overflow-y: auto;
+      opacity: 0;
+      visibility: hidden;          /* also keeps the links out of the tab order */
+      transform: translateY(-6px);
+      transition: opacity .18s ease, transform .18s ease, visibility .18s;
+    }
+    nav.site.open .nav-links {
+      opacity: 1;
+      visibility: visible;
+      transform: none;
+    }
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      min-height: 44px;
+      padding: 4px 0;
+      color: var(--ink);
+      border-top: 1px solid var(--line);
+    }
+    .nav-links a:first-child { border-top: 0; }
+  }
+
+  @media (max-width: 768px) and (prefers-reduced-motion: reduce) {
+    .nav-links,
+    .nav-toggle .bars,
+    .nav-toggle .bars::before,
+    .nav-toggle .bars::after { transition: none; }
+  }
+
   /* ---------- Hero ---------- */
   header.hero {
     padding: 56px 0 0;
@@ -597,10 +690,13 @@
 
 <div class="spectrum-bar"></div>
 
-<nav class="site">
+<nav class="site" id="site-nav">
   <div class="container">
     <a href="#top" class="wordmark plain">Haptics <em>Beyond</em> Vibration</a>
-    <div class="nav-links">
+    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
+      <span class="bars" aria-hidden="true"></span>
+    </button>
+    <div class="nav-links" id="nav-links">
       <a href="#about">About</a>
       <a href="#schedule">Schedule</a>
       <a href="#keynote">Keynote</a>
@@ -862,6 +958,43 @@
     <span class="mono">UIST '26 · SIGCHI · ACM · Detroit, MI</span>
   </div>
 </footer>
+
+<script>
+  (function () {
+    var nav = document.getElementById('site-nav');
+    var toggle = nav.querySelector('.nav-toggle');
+    var panel = document.getElementById('nav-links');
+
+    function setOpen(open) {
+      nav.classList.toggle('open', open);
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    }
+
+    toggle.addEventListener('click', function () {
+      setOpen(!nav.classList.contains('open'));
+    });
+
+    // Close once a destination is picked, on Escape, or on a tap outside.
+    panel.addEventListener('click', function (e) {
+      if (e.target.closest('a')) setOpen(false);
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && nav.classList.contains('open')) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+    document.addEventListener('click', function (e) {
+      if (nav.classList.contains('open') && !nav.contains(e.target)) setOpen(false);
+    });
+
+    // Growing past the breakpoint restores the untouched desktop nav.
+    window.matchMedia('(min-width: 769px)').addEventListener('change', function (e) {
+      if (e.matches) setOpen(false);
+    });
+  })();
+</script>
 
 </body>
 </html>
