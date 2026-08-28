@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haptics Beyond Vibration — UIST 2026 Workshop</title>
+<meta name="description" content="UIST 2026 Workshop on Haptics Beyond Vibration: Generative AI to Advance Multisensory Interfaces. Detroit, MI, USA.">
+<meta property="og:title" content="Haptics Beyond Vibration — UIST 2026 Workshop">
+<meta property="og:description" content="Generative AI to advance multisensory interfaces: temperature, taste, smell, airflow, and beyond.">
+<meta property="og:image" content="img/teaser.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400..700&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* ---- color (unchanged) ---- */
+    --paper: #faf6ef;
+    --paper-deep: #f3ecdf;
+    --ink: #211c15;
+    --muted: #6e6353;
+    --faint: #a39682;
+    --line: #e5dccb;
+    --hot: #d54e21;
+    --hot-deep: #b03a12;
+    --cold: #2e6f8e;
+    --spectrum: linear-gradient(90deg, #2e5f9e 0%, #2a9d8f 30%, #e9b44c 62%, #d54e21 85%, #a4231b 100%);
+
+    /* ---- type families ---- */
+    --font-hero: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+    --font-display: 'Newsreader', Georgia, 'Times New Roman', serif;
+    --font-sans: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+    /* ---- display scale ---- */
+    --fs-hero: clamp(3.6rem, 6vw, 4.7rem);        /* 57.6 – 75.2 px */
+    --fs-section: clamp(2.35rem, 4vw, 2.8rem);    /* 37.6 – 44.8 px */
+    --fs-display-lg: 1.55rem;                     /* 24.8 px — keynote name */
+    --fs-display-md: 1.28rem;                     /* 20.5 px — schedule item */
+    --fs-display-sm: 1.19rem;                     /* 19 px — organizer name */
+
+    /* ---- text scale (Inter) ---- */
+    --fs-lede: clamp(1.05rem, 1.4vw, 1.125rem);   /* 16.8 – 18 px — hero subtitle */
+    --fs-body: 1.04rem;                           /* 16.6 px — long-form copy */
+    --fs-body-md: 1rem;                           /* 16 px */
+    --fs-body-sm: 0.96rem;                        /* 15.4 px — descriptions */
+    --fs-body-xs: 0.925rem;                       /* 14.8 px — small descriptions */
+    --fs-ui: 0.9rem;                              /* 14.4 px — nav, buttons */
+    --fs-caption: 0.815rem;                       /* 13 px — figure caption */
+
+    /* ---- metadata scale (IBM Plex Mono) ---- */
+    --fs-meta: 0.8rem;                            /* 12.8 px — affiliations, dates */
+    --fs-meta-sm: 0.75rem;                        /* 12 px — section numbers, labels */
+    --fs-meta-xs: 0.735rem;                       /* 11.8 px — durations, step labels */
+
+    /* ---- line heights ---- */
+    --lh-hero: 0.94;
+    --lh-section: 1.02;
+    --lh-display: 1.2;
+    --lh-body: 1.6;
+    --lh-meta: 1.4;
+
+    /* ---- tracking ---- */
+    --ls-hero: -0.035em;
+    --ls-section: -0.025em;
+    --ls-display: -0.015em;
+    --ls-body: -0.008em;
+    --ls-mono: 0.06em;
+    --ls-mono-wide: 0.15em;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--fs-body);
+    font-weight: 400;
+    line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
+    background: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection { background: rgba(213,78,33,0.2); }
+
+  a { color: inherit; }
+  a.plain { text-decoration: none; }
+  .serif { font-family: var(--font-display); }
+  .mono { font-family: var(--font-mono); letter-spacing: var(--ls-mono); }
+
+  .container { max-width: 1020px; margin: 0 auto; padding: 0 28px; }
+
+  /* signature thermal spectrum bar */
+  .spectrum-bar { height: 5px; background: var(--spectrum); }
+
+  /* ---------- Nav ---------- */
+  nav.site {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(250,246,239,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+  nav.site .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    padding-bottom: 14px;
+    gap: 16px;
+  }
+  .wordmark {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.06rem;          /* 17 px */
+    line-height: 1.25;
+    letter-spacing: -0.012em;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .wordmark em {
+    font-style: normal;
+    padding-right: 0.05em;
+    background: var(--spectrum);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    font-size: var(--fs-ui);
+    font-weight: 450;
+    letter-spacing: -0.004em;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .nav-links a { text-decoration: none; }
+  .nav-links a:hover { color: var(--hot-deep); }
+
+  /* ---------- Hero ---------- */
+  header.hero {
+    padding: 56px 0 0;
+  }
+  .conf-line {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    font-weight: 500;
+    line-height: var(--lh-meta);
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .conf-line .tick {
+    display: inline-block;
+    width: 34px;
+    height: 5px;
+    background: var(--spectrum);
+    border-radius: 2px;
+  }
+  h1.title {
+    font-family: var(--font-hero);
+    font-weight: 400;
+    font-size: var(--fs-hero);
+    line-height: var(--lh-hero);
+    letter-spacing: var(--ls-hero);
+    white-space: nowrap;
+    margin-top: 24px;
+    max-width: none;
+  }
+  /* The italic overhangs its box, so the glyph gets padding — but the padding is
+     NOT cancelled on the right, which is what keeps the space before "Vibration". */
+  h1.title .beyond {
+    font-family: inherit;
+    font-style: italic;
+    font-weight: 400;
+    display: inline-block;
+    padding: 0.04em 0.09em 0.06em 0.02em;
+    margin: -0.04em 0 -0.06em -0.02em;
+    background: var(--spectrum);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  /* Allow normal wrapping again on tablet/mobile, where one line cannot fit. */
+  @media (max-width: 800px) {
+    h1.title {
+      white-space: normal;
+      text-wrap: balance;
+      font-size: clamp(2.9rem, 8.5vw, 3.6rem);
+      max-width: 900px;
+    }
+  }
+  .tagline {
+    margin-top: 22px;
+    font-size: var(--fs-lede);
+    font-weight: 400;
+    line-height: 1.55;
+    letter-spacing: -0.01em;
+    text-wrap: pretty;
+    color: var(--muted);
+    max-width: 900px;
+  }
+
+  .hero-cta {
+    margin-top: 34px;
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-block;
+    text-decoration: none;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    font-size: var(--fs-ui);
+    line-height: 1.2;
+    letter-spacing: -0.004em;
+    padding: 13px 26px;
+    border-radius: 6px;
+    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+  }
+  .btn-solid {
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .btn-solid:hover { background: var(--hot-deep); transform: translateY(-1px); }
+  .btn-ghost {
+    border: 1.5px solid var(--ink);
+  }
+  .btn-ghost:hover { background: var(--ink); color: var(--paper); }
+
+  .facts {
+    margin-top: 48px;
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
+  .facts > div {
+    padding: 18px 20px 18px 0;
+    border-right: 1px solid var(--line);
+  }
+  .facts > div:last-child { border-right: none; }
+  .facts > div + div { padding-left: 20px; }
+  .facts .k {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta-xs);
+    font-weight: 500;
+    line-height: var(--lh-meta);
+    letter-spacing: var(--ls-mono-wide);
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+  .facts .v {
+    font-size: var(--fs-body-md);
+    font-weight: 550;
+    line-height: 1.4;
+    letter-spacing: var(--ls-body);
+    margin-top: 5px;
+  }
+
+  /* ---------- Teaser ---------- */
+  .teaser { padding: 46px 0 8px; }
+  .teaser img {
+    width: 100%;
+    display: block;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+  }
+  .teaser figcaption {
+    margin-top: 14px;
+    font-size: var(--fs-caption);
+    line-height: 1.55;
+    letter-spacing: -0.004em;
+    text-wrap: pretty;
+    color: var(--faint);
+  }
+
+  /* ---------- Sections ---------- */
+  section { padding: 72px 0 0; }
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+  .sec-num {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta-sm);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: var(--ls-mono);
+    color: var(--hot);
+  }
+  h2.sec-title {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-section);
+    line-height: var(--lh-section);
+    letter-spacing: var(--ls-section);
+    text-wrap: balance;
+  }
+
+  /* About */
+  .about-grid {
+    max-width: 900px;            /* same measure as the hero tagline */
+  }
+  .about-grid p {
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
+    text-wrap: pretty;
+    color: #4a4136;
+    margin-bottom: 1.1em;
+  }
+  .about-grid p:last-child { margin-bottom: 0; }
+  .about-grid p strong { color: var(--ink); font-weight: 600; }
+
+  /* Schedule */
+  .sched-note {
+    max-width: 720px;
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    letter-spacing: var(--ls-body);
+    text-wrap: pretty;
+    color: var(--muted);
+    margin-bottom: 34px;
+  }
+  .sched {
+    border-left: 3px solid transparent;
+    border-image: linear-gradient(180deg, #2e5f9e, #2a9d8f, #e9b44c, #d54e21, #a4231b) 1;
+    padding-left: 0;
+  }
+  .sched-row {
+    display: grid;
+    grid-template-columns: 170px 1fr;
+    gap: 26px;
+    padding: 22px 0 22px 30px;
+    border-bottom: 1px solid var(--line);
+  }
+  .sched-row:last-child { border-bottom: none; }
+  .sched-row.break { background: var(--paper-deep); }
+  .sched-when .time {
+    font-family: var(--font-mono);
+    font-size: 0.98rem;          /* 15.7 px */
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: 0.01em;
+  }
+  .sched-when .dur {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta-xs);
+    font-weight: 500;
+    line-height: var(--lh-meta);
+    letter-spacing: 0.1em;
+    color: var(--faint);
+    margin-top: 3px;
+  }
+  .sched-body h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-display-md);
+    line-height: var(--lh-display);
+    letter-spacing: var(--ls-display);
+    margin-bottom: 7px;
+  }
+  .sched-body p {
+    font-size: var(--fs-body-sm);
+    line-height: 1.58;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+    color: var(--muted);
+    max-width: 640px;
+  }
+  @media (max-width: 640px) {
+    .sched-row { grid-template-columns: 1fr; gap: 6px; padding-left: 20px; }
+  }
+
+  /* Keynote */
+  .keynote-card {
+    display: flex;
+    align-items: center;
+    gap: 34px;
+    background: var(--paper-deep);
+    border-radius: 12px;
+    padding: 34px 38px;
+  }
+  /* The card now spans the full container width, matching the schedule above.
+     The text block keeps its original 540px measure so nothing inside reflows. { max-width: 540px; }*/
+  .keynote-card > div:not(.photo)  {
+    flex: 1 1 auto;
+    max-width: none;
+    min-width: 0;
+  }
+  @media (max-width: 560px) { .keynote-card { flex-direction: column; text-align: center; } }
+  .keynote-card .photo {
+    flex: 0 0 auto;
+    width: 130px;
+    height: 130px;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(140deg, #2e5f9e 0%, #2a9d8f 35%, #e9b44c 68%, #d54e21 100%);
+  }
+  .keynote-card .photo .initials {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 2.5rem;
+    letter-spacing: 0.01em;
+    color: rgba(250,246,239,0.9);
+  }
+  .keynote-card .photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .keynote-card h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-display-lg);
+    line-height: var(--lh-display);
+    letter-spacing: -0.02em;
+  }
+  .keynote-card .affil {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    font-weight: 500;
+    line-height: var(--lh-meta);
+    letter-spacing: 0.02em;
+    color: var(--hot-deep);
+    margin-top: 5px;
+  }
+  .keynote-card .blurb {
+    font-size: var(--fs-body-sm);
+    line-height: 1.58;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+    color: var(--muted);
+    margin-top: 12px;
+  }
+
+  /* Organizers */
+  .org-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 44px 32px;
+  }
+  @media (max-width: 860px) { .org-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .org-grid { grid-template-columns: 1fr 1fr; gap: 32px 20px; } }
+  .org { text-align: center; }
+  .org .photo {
+    width: 112px;
+    height: 112px;
+    margin: 0 auto;
+    border-radius: 50%;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(140deg, #2e5f9e 0%, #2a9d8f 35%, #e9b44c 68%, #d54e21 100%);
+  }
+  .org .photo .initials {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-weight: 500;
+    font-size: 2.125rem;
+    letter-spacing: 0.01em;
+    color: rgba(250,246,239,0.9);
+  }
+  .org .photo img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .org h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: var(--fs-display-sm);
+    line-height: 1.25;
+    letter-spacing: var(--ls-display);
+    margin-top: 16px;
+  }
+  .org h3 a { text-decoration: none; }
+  .org h3 a:hover { color: var(--hot-deep); }
+  .org .affil {
+    font-family: var(--font-mono);
+    font-size: var(--fs-meta);
+    font-weight: 500;
+    line-height: var(--lh-meta);
+    letter-spacing: 0.01em;
+    color: var(--hot-deep);
+    margin-top: 4px;
+  }
+  .org .bio {
+    font-size: 0.94rem;          /* 15 px */
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+    color: var(--muted);
+    margin-top: 10px;
+    text-align: left;
+  }
+
+  /* Participate */
+  .participate-wrap {
+    margin-top: 6px;
+    background: var(--ink);
+    color: var(--paper);
+    border-radius: 14px;
+    padding: 46px 46px 44px;
+    position: relative;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(0, 2.75fr) minmax(0, 1fr);  /* ~70% / ~26% */
+    gap: 36px;
+    align-items: center;
+  }
+  .participate-wrap::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 5px;
+    background: var(--spectrum);
+  }
+  .participate-wrap .lede {
+    font-size: var(--fs-body-md);          /* 16 px */
+    line-height: 1.6;
+    letter-spacing: -0.005em;
+    text-wrap: pretty;
+    color: #cfc5b6;
+  }
+  /* CTA sits in the right column, anchored to the card's right edge and
+     vertically centred against the paragraph by the grid's align-items. */
+  .participate-cta { justify-self: end; }
+  .participate-cta .btn-solid {
+    background: var(--hot);
+    color: #fff;
+    font-size: 0.95rem;                    /* 15.2 px */
+    font-weight: 550;
+    padding: 14px 28px;
+  }
+  .participate-cta .btn-solid:hover { background: var(--hot-deep); }
+  @media (max-width: 760px) {
+    .participate-wrap {
+      grid-template-columns: 1fr;
+      gap: 26px;
+      padding: 30px 28px 32px;
+    }
+    .participate-cta { justify-self: start; }
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 80px;
+    border-top: 1px solid var(--line);
+    padding: 28px 0 40px;
+  }
+  footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    font-size: 0.875rem;         /* 14 px */
+    line-height: 1.5;
+    letter-spacing: -0.004em;
+    color: var(--faint);
+  }
+  footer .mono {
+    font-size: var(--fs-meta);
+    letter-spacing: var(--ls-mono);
+  }
+</style>
+</head>
+<body>
+
+<div class="spectrum-bar"></div>
+
+<nav class="site">
+  <div class="container">
+    <a href="#top" class="wordmark plain">Haptics <em>Beyond</em> Vibration</a>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#keynote">Keynote</a>
+      <a href="#organizers">Organizers</a>
+      <a href="#participate">Participate</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="container">
+    <p class="conf-line"><span class="tick"></span> UIST 2026 WORKSHOP</p>
+    <h1 class="title">Haptics <span class="beyond">Beyond</span> Vibration</h1>
+    <p class="tagline">Generative AI to Advance Multisensory Interfaces. How might AI support the authoring, prototyping, personalization, and evaluation of sensory feedback that is hard to describe, simulate, or standardize?</p>
+
+    <div class="hero-cta">
+      <a class="btn btn-solid" href="#participate">Participate</a>
+      <a class="btn btn-ghost" href="PDF/workshop_proposal.pdf">Workshop Proposal</a>
+    </div>
+
+    <div class="facts">
+      <div>
+        <div class="k">Date</div>
+        <div class="v">November 2, 2026</div>
+      </div>
+      <div>
+        <div class="k">Time</div>
+        <div class="v">9:00 AM – 12:15 PM</div>
+      </div>
+      <div>
+        <div class="k">Location</div>
+        <div class="v">University of Michigan Detroit Center</div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<figure class="teaser">
+  <div class="container">
+    <img src="img/website_teaser.jpg" alt="Examples of multisensory interfaces beyond conventional vibrotactile and force-based feedback">
+    <figcaption>
+      Multisensory interfaces beyond conventional vibrotactile and force-based feedback:
+      (a) chemical modulation of perceived taste with <i>Taste Retargeting</i>;
+      (b) pain-like sensations produced through the thermal grill illusion with <i>ThermOuch</i>;
+      (c) respiration-synchronized thermal stimulation with <i>Augmented Breathing</i>;
+      (d) accelerated perceived thermal transitions with <i>TherMosaic</i>;
+      (e) hand-centered thermal feedback with <i>Fiery Hands</i>.
+    </figcaption>
+  </div>
+</figure>
+
+<section id="about">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-num mono">01</span>
+      <h2 class="sec-title">About the Workshop</h2>
+    </div>
+    <div class="about-grid">
+        <p>
+          Immersive experiences are increasingly moving beyond conventional vibrotactile and force-based feedback toward 
+          multisensory interaction. Researchers in the UIST community have explored how modalities including temperature, 
+          taste, smell, and airflow can enrich virtual experiences, embodied interaction, accessibility, and human perception.
+        </p>
+        <p>
+          Yet designing, authoring, and evaluating these experiences remains challenging. Unlike visual or auditory media, 
+          sensations such as warmth, smell, taste, or pain-adjacent feedback are <strong>difficult to describe, reproduce, 
+          and standardize</strong>. They depend heavily on individual perception, physical context, hardware constraints, 
+          and safety considerations, while suitable datasets and shared representations remain limited.
+        </p>
+        <p>
+          <strong>This workshop examines the intersection of generative AI and nontraditional haptics.</strong> We ask where 
+          AI can meaningfully support the creation and evaluation of multisensory feedback, as well as where its limitations 
+          and risks remain. The workshop will identify needs for design vocabularies, authoring tools, datasets, evaluation 
+          methods, safety guidelines, and future research directions for AI-mediated multisensory interfaces.
+        </p>
+    </div>
+  </div>
+</section>
+
+<section id="schedule">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-num mono">02</span>
+      <h2 class="sec-title">Schedule</h2>
+    </div>
+    <div class="sched">
+      <div class="sched-row">
+        <div class="sched-when">
+          <div class="time">9:00</div>
+          <div class="dur">40 MIN</div>
+        </div>
+        <div class="sched-body">
+          <h3>Opening &amp; Keynote</h3>
+          <p>Round-table introductions, followed by a 20-minute keynote by <a href="#keynote">Prof. Craig Shultz</a> and a 10-minute Q&amp;A.</p>
+        </div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-when">
+          <div class="time">9:40</div>
+          <div class="dur">50 MIN</div>
+        </div>
+        <div class="sched-body">
+          <h3>Hands-On Interactive Demos</h3>
+          <p>Tables rotate through demo stations centered on thermal, taste, smell, airflow, and other nontraditional modalities (~15 minutes each).</p>
+        </div>
+      </div>
+      <div class="sched-row break">
+        <div class="sched-when">
+          <div class="time">10:30</div>
+          <div class="dur">30 MIN</div>
+        </div>
+        <div class="sched-body">
+          <h3>Coffee Break — Demos Stay Open</h3>
+          <p>Demo stations remain open so participants can revisit them informally.</p>
+        </div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-when">
+          <div class="time">11:00</div>
+          <div class="dur">30 MIN</div>
+        </div>
+        <div class="sched-body">
+          <h3>Brainstorming Session</h3>
+          <p>Discussion of how generative AI can support multisensory interaction research, where its current limitations and risks lie, and which tools, datasets, vocabularies, and evaluation methods are still missing.</p>
+        </div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-when">
+          <div class="time">11:30</div>
+          <div class="dur">30 MIN</div>
+        </div>
+        <div class="sched-body">
+          <h3>Discussion &amp; Synthesis</h3>
+          <p>Each table presents its brainstorming results; organizers facilitate a synthesis of recurring themes, open research questions, and possible community-level resources.</p>
+        </div>
+      </div>
+      <div class="sched-row">
+        <div class="sched-when">
+          <div class="time">12:00</div>
+          <div class="dur">15 MIN</div>
+        </div>
+        <div class="sched-body">
+          <h3>Closing &amp; Next Steps</h3>
+          <p>Identification of concrete next steps, including research questions, collaborations, shared datasets, demo repositories, and evaluation guidelines for AI-mediated multisensory interfaces.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="keynote">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-num mono">03</span>
+      <h2 class="sec-title">Keynote Speaker</h2>
+    </div>
+    <div class="keynote-card">
+      <div class="photo">
+        <span class="initials">CS</span>
+        <img src="pics/craig.jpg" alt="Craig Shultz" onerror="this.remove()">
+      </div>
+      <div>
+        <h3>Craig Shultz</h3>
+        <p class="affil">University of Illinois Urbana-Champaign</p>
+        <p class="blurb">Assistant Professor of Electrical and Computer Engineering at the University of Illinois Urbana-Champaign and co-founder of Fluid Reality, developing interactive embedded systems, spatial haptics, and high-performance actuation for XR and robotics. </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="organizers">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-num mono">04</span>
+      <h2 class="sec-title">Organizers</h2>
+    </div>
+    <div class="org-grid">
+
+      <div class="org">
+        <div class="photo">
+          <span class="initials">ZZ</span>
+          <img src="pics/zining.jpg" alt="Zining Zhang" onerror="this.remove()">
+        </div>
+        <h3>Zining Zhang</h3>
+        <p class="affil">University of Maryland</p>
+      </div>
+
+      <div class="org">
+        <div class="photo">
+          <span class="initials">DH</span>
+          <img src="pics/daniel.jpg" alt="Daniel Honrales" onerror="this.remove()">
+        </div>
+        <h3>Daniel Honrales</h3>
+        <p class="affil">University of Texas at Dallas</p>
+      </div>
+
+      <div class="org">
+        <div class="photo">
+          <span class="initials">JB</span>
+          <img src="pics/jas.jpg" alt="Jas Brooks" onerror="this.remove()">
+        </div>
+        <h3>Jas Brooks</h3>
+        <p class="affil">MIT CSAIL</p>
+      </div>
+
+      <div class="org">
+        <div class="photo">
+          <span class="initials">JK</span>
+          <img src="pics/jin.jpg" alt="Jin Ryong Kim" onerror="this.remove()">
+        </div>
+        <h3>Jin Ryong Kim</h3>
+        <p class="affil">University of Texas at Dallas</p>
+      </div>
+
+      <div class="org">
+        <div class="photo">
+          <span class="initials">KZ</span>
+          <img src="pics/kening.jpg" alt="Kening Zhu" onerror="this.remove()">
+        </div>
+        <h3>Kening Zhu</h3>
+        <p class="affil">City University of Hong Kong</p>
+      </div>
+
+      <div class="org">
+        <div class="photo">
+          <span class="initials">HP</span>
+          <img src="pics/huaishu.jpg" alt="Huaishu Peng" onerror="this.remove()">
+        </div>
+        <h3>Huaishu Peng</h3>
+        <p class="affil">University of Maryland</p>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="participate">
+  <div class="container">
+    <div class="sec-head">
+      <span class="sec-num mono">05</span>
+      <h2 class="sec-title">Participate</h2>
+    </div>
+    <div class="participate-wrap">
+      <p class="lede">
+        Researchers and practitioners across haptics, multisensory interaction, AI-assisted design, physiology, and
+        immersive experiences are welcome. No position paper or additional submission is required. Participants are also
+        welcome to bring a hands-on multisensory demo to share during the workshop.
+      </p>
+      <div class="participate-cta">
+        <a class="btn btn-solid" href="https://cvent.me/zd9527" target="_blank" rel="noopener">Sign Up</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <span>Haptics Beyond Vibration: Generative AI to Advance Multisensory Interfaces</span>
+    <span class="mono">UIST '26 · SIGCHI · ACM · Detroit, MI</span>
+  </div>
+</footer>
+
+</body>
+</html>
