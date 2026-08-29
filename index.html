@@ -32,7 +32,8 @@
     --font-mono: 'IBM Plex Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 
     /* ---- display scale ---- */
-    --fs-hero: clamp(3.6rem, 6vw, 4.7rem);        /* 57.6 – 75.2 px */
+    --fs-hero: clamp(3rem, 5.2vw, 5.5rem);        /* 48 – 88 px — emphasised half */
+    --fs-hero-lead: clamp(2rem, 3.2vw, 3.3rem);   /* 32 – 52.8 px — formal lead */
     --fs-section: clamp(2.35rem, 4vw, 2.8rem);    /* 37.6 – 44.8 px */
     --fs-display-lg: 1.55rem;                     /* 24.8 px — keynote name */
     --fs-display-md: 1.28rem;                     /* 20.5 px — schedule item */
@@ -121,14 +122,6 @@
     letter-spacing: -0.012em;
     text-decoration: none;
     white-space: nowrap;
-  }
-  .wordmark em {
-    font-style: normal;
-    padding-right: 0.05em;
-    background: var(--spectrum);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
   }
   .nav-links {
     display: flex;
@@ -264,32 +257,41 @@
     font-size: var(--fs-hero);
     line-height: var(--lh-hero);
     letter-spacing: var(--ls-hero);
-    white-space: nowrap;
     margin-top: 24px;
-    max-width: none;
   }
-  /* The italic overhangs its box, so the glyph gets padding — but the padding is
-     NOT cancelled on the right, which is what keeps the space before "Vibration". */
-  h1.title .beyond {
-    font-family: inherit;
-    font-style: italic;
-    font-weight: 400;
+  /* One heading, one reading order: the formal lead is a size step within the
+     same title — same ink, no colour emphasis — not a separate subtitle. */
+  h1.title .t-lead {
+    display: block;
+    font-size: var(--fs-hero-lead);
+    letter-spacing: -0.022em;
+    color: var(--ink);
+    margin-bottom: 0.08em;
+  }
+  h1.title .t-main { display: block; }
+  /* The signature spectrum, moved off "Beyond" and onto the two phrases the
+     workshop is actually about. Same token as .spectrum-bar and .conf-line .tick.
+     inline-block + padding/negative-margin keeps the gradient box clear of the
+     glyphs under the sub-1 hero line-height, without shifting layout. */
+  h1.title .accent {
     display: inline-block;
-    padding: 0.04em 0.09em 0.06em 0.02em;
-    margin: -0.04em 0 -0.06em -0.02em;
+    padding: 0.09em 0 0.11em;
+    margin: -0.09em 0 -0.11em;
     background: var(--spectrum);
     -webkit-background-clip: text;
     background-clip: text;
     color: transparent;
+    -webkit-text-fill-color: transparent;
   }
-  /* Allow normal wrapping again on tablet/mobile, where one line cannot fit. */
+  /* Hold each emphasised phrase on one line so its gradient runs unbroken. */
+  @media (min-width: 600px) {
+    h1.title .accent { white-space: nowrap; }
+  }
+  /* Tablet/mobile: 7.8vw is the largest step that still keeps the longest line,
+     "Generative AI to Advance" (10.28em), inside the column at 320px. */
   @media (max-width: 800px) {
-    h1.title {
-      white-space: normal;
-      text-wrap: balance;
-      font-size: clamp(2.9rem, 8.5vw, 3.6rem);
-      max-width: 900px;
-    }
+    h1.title { font-size: clamp(1.5rem, 7.8vw, 4rem); }
+    h1.title .t-lead { font-size: clamp(1.05rem, 5.05vw, 2.6rem); }
   }
   .tagline {
     margin-top: 22px;
@@ -692,7 +694,7 @@
 
 <nav class="site" id="site-nav">
   <div class="container">
-    <a href="#top" class="wordmark plain">Haptics <em>Beyond</em> Vibration</a>
+    <a href="#top" class="wordmark plain">Haptics Beyond Vibration</a>
     <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="nav-links">
       <span class="bars" aria-hidden="true"></span>
     </button>
@@ -709,8 +711,11 @@
 <header class="hero" id="top">
   <div class="container">
     <p class="conf-line"><span class="tick"></span> UIST 2026 WORKSHOP</p>
-    <h1 class="title">Haptics <span class="beyond">Beyond</span> Vibration</h1>
-    <p class="tagline">Generative AI to Advance Multisensory Interfaces. How might AI support the authoring, prototyping, personalization, and evaluation of sensory feedback that is hard to describe, simulate, or standardize?</p>
+    <h1 class="title">
+      <span class="t-lead">Haptics Beyond Vibration:</span>
+      <span class="t-main"><span class="accent">Generative AI</span> to Advance <span class="accent">Multisensory Interfaces</span></span>
+    </h1>
+    <p class="tagline">How might AI support the authoring, prototyping, personalization, and evaluation of sensory feedback that is hard to describe, simulate, or standardize?</p>
 
     <div class="hero-cta">
       <a class="btn btn-solid" href="#participate">Participate</a>
